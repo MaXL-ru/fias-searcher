@@ -100,11 +100,13 @@
         clearSelect(cityEl);
         disableSelect(cityEl);
         
-        loadCities(
-          function () {
-            enableSelect(cityEl);
-          }
-        );
+        if (_this.searchValues.regionId) {
+          loadCities(
+            function () {
+              enableSelect(cityEl);
+            }
+          );
+        }
       }
     );
   };
