@@ -1,0 +1,48 @@
+
+/**
+ * 24.08.2020
+ * File: fias.css
+ * Encoding: UTF-8
+ * Author: MaXL
+ * */
+
+body {
+  padding: 2rem;
+}
+
+h1 {
+  text-align: center;
+}
+
+/**
+ search form styles
+ */
+
+.fias__searchform {
+  padding-bottom: 3rem;
+}
+
+.fias__searchform select {
+  width: 20rem;
+}
+
+.fias__searchform label {
+  display: block;
+  padding-bottom: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.fias__searchform__row {
+  overflow: hidden;
+  padding-bottom: 2rem;
+}
+
+.fias__searchform__row > div {
+  float: left;
+  margin-right: 2rem;
+}
+
+.fias__searchform__btn__search {
+  font-size: 1.2rem;
+  padding: 0.3rem;
+}
