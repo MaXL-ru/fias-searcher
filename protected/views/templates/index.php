@@ -21,6 +21,7 @@
         <div class="fias__searchform__region">
           <label for="search_fias_region_id">Регион / Область / АО</label>
           <select name="region" autocomplete="off" id="search_fias_region_id">
+            <option value=""></option>
             <?php foreach ($regions as $region): ?>
               <option value="<?= $region['guid'] ?>"><?= $region['name'] ?></option>
             <?php endforeach; ?>

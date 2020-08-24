@@ -13,6 +13,8 @@ namespace maxl\fias\controllers;
 
 class Controller
 {
+  private const E_INVALID_PARAMS = 'Invalid action params';
+  
   private \maxl\fias\views\WebViewer $_viewer;
   
   private \maxl\fias\providers\Postgres $_postgresProvider;
@@ -34,6 +36,19 @@ class Controller
     );
   }
   
+  public function actionCities(): void
+  {
+    $regionId = (string)$this->_fromGet('regionGuid');
+    
+    if (!$regionId) {
+      throw new \Exception(self::E_INVALID_PARAMS);
+    }
+    
+    $this->_viewer->renderJson(
+      $this->_postgresProvider->findCities($regionId)
+    );
+  }
+  
   private function _initDataProviders(): void
   {
     $this->_postgresProvider = new \maxl\fias\providers\Postgres(
@@ -41,5 +56,10 @@ class Controller
       \MaxlFiasConfig::DB['postgres']['username'],
       \MaxlFiasConfig::DB['postgres']['password']
     );
+  }
+  
+  private function _fromGet(string $name)
+  {
+    return $_GET[$name] ?? null;
   }
 }

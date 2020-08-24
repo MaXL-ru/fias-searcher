@@ -28,6 +28,13 @@ class WebViewer
     require_once $viewerFileName;
   }
   
+  public function renderJson($data): void
+  {
+    header('Content-type: application/javascript');
+    
+    echo json_encode($data);
+  }
+  
   private function _getViewerFullFileName($fileName): string
   {
     $fullFileName = $this->_templatesPath . $fileName .
