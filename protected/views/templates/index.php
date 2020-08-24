@@ -23,7 +23,9 @@
           <select name="region" autocomplete="off" id="search_fias_region_id">
             <option value=""></option>
             <?php foreach ($regions as $region): ?>
-              <option value="<?= $region['guid'] ?>"><?= $region['name'] ?></option>
+              <option value="<?= $region['value'] ?>">
+                <?= htmlspecialchars($region['text'], ENT_QUOTES) ?>
+              </option>
             <?php endforeach; ?>
           </select>
         </div>

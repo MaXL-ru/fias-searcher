@@ -48,6 +48,19 @@ class Controller
       $this->_postgresProvider->findCities($regionId)
     );
   }
+
+  public function actionStreets(): void
+  {
+    $cityGuid = (string)$this->_fromGet('cityGuid');
+
+    if (!$cityGuid) {
+      throw new \Exception(self::E_INVALID_PARAMS);
+    }
+
+    $this->_viewer->renderJson(
+      $this->_postgresProvider->findStreets($cityGuid)
+    );
+  }
   
   private function _initDataProviders(): void
   {

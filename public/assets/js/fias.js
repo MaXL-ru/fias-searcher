@@ -11,6 +11,10 @@
   const EVENT_DOM_ELEMENT_CHANGE = 'change';
 
   // helpers
+  const getElementById = function (id) {
+    return document.getElementById(id);
+  };
+  
   const getSelectedValue = function (element) {
     return element.options[element.selectedIndex].value;
   };
@@ -64,8 +68,9 @@
     let _this = this;
     
     // search elements
-    const regionEl = document.getElementById('search_fias_region_id');
-    const cityEl  = document.getElementById('search_fias_city_id');
+    const regionEl = getElementById('search_fias_region_id');
+    const cityEl   = getElementById('search_fias_city_id');
+    const streetEl = getElementById('search_fias_street_id');
     
     // selected values
     _this.searchValues = {
@@ -81,7 +86,18 @@
         '/index.php?action=cities&regionGuid=' + _this.searchValues.regionId,
         function (cities) {
           assignItemsToSelect(cityEl, cities);
-
+          
+          callback();
+        }
+      );
+    };
+    
+    const loadStreets = function (callback) {
+      getJson(
+        '/index.php?action=streets&cityGuid=' + _this.searchValues.cityId,
+        function (streets) {
+          assignItemsToSelect(streetEl, streets);
+          
           callback();
         }
       );
@@ -96,14 +112,37 @@
         _this.searchValues.streetId = null;
         _this.searchValues.houseId = null;
         
-        //loadStreets();
-        clearSelect(cityEl);
+        // clear and disabled depends selects
         disableSelect(cityEl);
+        disableSelect(streetEl);
+        clearSelect(cityEl);
+        clearSelect(streetEl);
         
         if (_this.searchValues.regionId) {
           loadCities(
             function () {
               enableSelect(cityEl);
+            }
+          );
+        }
+      }
+    );
+    
+    cityEl.addEventListener(
+      EVENT_DOM_ELEMENT_CHANGE,
+      function () {
+        _this.searchValues.cityId = getSelectedValue(cityEl);
+        _this.searchValues.streetId = null;
+        _this.searchValues.houseId = null;
+
+        // clear and disable depends selects
+        disableSelect(streetEl);
+        clearSelect(streetEl);
+        
+        if (_this.searchValues.cityId) {
+          loadStreets(
+            function () {
+              enableSelect(streetEl);
             }
           );
         }

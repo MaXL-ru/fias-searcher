@@ -15,8 +15,9 @@ class Postgres
 {
   private const FIAS_LEVEL_ID_REGION = 1;
   private const FIAS_LEVEL_ID_CITY   = 4;
+  private const FIAS_LEVEL_ID_STREET = 7;
   
-  private \Pdo $_pdo;
+  private \PDO $_pdo;
   
   public function __construct(string $dsn, string $username, $password)
   {
@@ -29,35 +30,45 @@ class Postgres
   
   public function findRegions(): array
   {
-    return $this->_fetchFromQuery(
-      '
-        SELECT
-          "OFFNAME" AS name, "AOGUID" AS guid
-        FROM "ADDROB"
-        WHERE "AOLEVEL" = :levelId AND "NEXTID" IS NULL
-        ORDER BY "OFFNAME"
-      ',
-      [
-        ':levelId' => self::FIAS_LEVEL_ID_REGION
-      ]
-    );
+    return $this->_findMainAddrRecords(self::FIAS_LEVEL_ID_REGION, null);
   }
   
   public function findCities(string $regionGuid): array
   {
+    return $this->_findMainAddrRecords(self::FIAS_LEVEL_ID_CITY, $regionGuid);
+  }
+
+  public function findStreets(string $cityGuid): array
+  {
+    return $this->_findMainAddrRecords(self::FIAS_LEVEL_ID_STREET, $cityGuid);
+  }
+  
+  private function _findMainAddrRecords(
+    int $levelId,
+    ?string $parentGuid
+  ): array {
+    $where = [
+      '"NEXTID" IS NULL',
+      '"AOLEVEL" = :levelId'
+    ];
+    $params = [':levelId' => $levelId];
+    
+    if ($parentGuid !== null) {
+      $where[] = '"PARENTGUID" = :parentGuid';
+      $params[':parentGuid'] = $parentGuid;
+    }
+    
+    $whereSql = implode(' AND ', $where);
+    
     return $this->_fetchFromQuery(
       '
         SELECT
           "OFFNAME" AS text, "AOGUID" AS value
         FROM "ADDROB"
-        WHERE "AOLEVEL" = :levelId AND "PARENTGUID" = :regionGuid AND
-          "NEXTID" IS NULL
+        WHERE ' . $whereSql . '
         ORDER BY "OFFNAME"
       ',
-      [
-        ':levelId'    => self::FIAS_LEVEL_ID_CITY,
-        ':regionGuid' => $regionGuid
-      ]
+      $params
     );
   }
   
