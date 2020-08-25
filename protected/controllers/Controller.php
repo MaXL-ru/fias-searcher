@@ -62,7 +62,7 @@ class Controller
     );
   }
 
-  public function actionHOuses(): void
+  public function actionHouses(): void
   {
     $streetGuid = (string)$this->_fromGet('streetGuid');
 
