@@ -14,6 +14,11 @@ class MaxlFiasConfig
       'dsn'      => 'pgsql:host=127.0.0.1;port=5432;dbname=fiasdb',
       'username' => 'postgres',
       'password' => 'Neu8cC3BKTpRywaN'
+    ],
+    'mariadb' => [
+      'dsn'      => 'mysql:host=127.0.0.1;port=3307;dbname=fiasdb;charset=utf8',
+      'username' => 'root',
+      'password' => 'tzzxD4mDXn5WQD4p'
     ]
   ];
 };

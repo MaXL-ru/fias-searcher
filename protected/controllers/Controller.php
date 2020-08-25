@@ -14,6 +14,7 @@ namespace maxl\fias\controllers;
 class Controller
 {
   private const E_INVALID_PARAMS = 'Invalid action params';
+  private const E_CANNOT_INSERT_TO_MARIADB = 'Cannot insert items to maria db';
   
   private \maxl\fias\views\WebViewer $_viewer;
   
@@ -77,27 +78,43 @@ class Controller
 
   public function actionSearch(): void
   {
-    $regionId = (string)$this->_fromGet('regionGuid');
-    $cityGuid = (string)$this->_fromGet('cityGuid');
-    $streetGuid = (string)$this->_fromGet('streetGuid');
-    $houseGuid = (string)$this->_fromGet('houseGuid');
-    
-    if (!$regionId || !$cityGuid || !$streetGuid) {
-      throw new \Exception(self::E_INVALID_PARAMS);
-    }
+    $form = $this->_loadSearchForm();
 
     $this->_viewer->renderJson(
       array_map(
         fn (array $address) => array_values($address),
         array_values(
           $this->_postgresProvider->search(
-            $regionId,
-            $cityGuid,
-            $streetGuid,
-            $houseGuid
+            $form->regionId,
+            $form->cityGuid,
+            $form->streetGuid,
+            $form->houseGuid
           )
         )
       )
+    );
+  }
+  
+  public function actionExportToMariaDb(): void
+  {
+    $form = $this->_loadSearchForm();
+    
+    $mariaDbProvider = $this->_initMariaDb();
+
+    $isInserted = $mariaDbProvider->insertAddresses(
+      $this->_postgresProvider->search(
+        $form->regionId,
+        $form->cityGuid,
+        $form->streetGuid,
+        $form->houseGuid
+      )
+    );
+    
+    $this->_viewer->renderJson(
+      $isInserted ?
+        ['isOk' => true]
+        :
+        ['error' => self::E_CANNOT_INSERT_TO_MARIADB]
     );
   }
   
@@ -108,6 +125,36 @@ class Controller
       \MaxlFiasConfig::DB['postgres']['username'],
       \MaxlFiasConfig::DB['postgres']['password']
     );
+  }
+  
+  private function _initMariaDb(): \maxl\fias\providers\MariaDB
+  {
+    return new \maxl\fias\providers\MariaDB(
+      \MaxlFiasConfig::DB['mariadb']['dsn'],
+      \MaxlFiasConfig::DB['mariadb']['username'],
+      \MaxlFiasConfig::DB['mariadb']['password']
+    );
+  }
+
+  private function _loadSearchForm(): object
+  {
+    $form = new class {
+      public string $regionId;
+      public string $cityGuid;
+      public string $streetGuid;
+      public ?string $houseGuid;
+    };
+    
+    $form->regionId = (string)$this->_fromGet('regionGuid');
+    $form->cityGuid = (string)$this->_fromGet('cityGuid');
+    $form->streetGuid = (string)$this->_fromGet('streetGuid');
+    $form->houseGuid = (string)$this->_fromGet('houseGuid');
+    
+    if (!$form->regionId || !$form->cityGuid || !$form->streetGuid) {
+      throw new \Exception(self::E_INVALID_PARAMS);
+    }
+    
+    return $form;
   }
   
   private function _fromGet(string $name)

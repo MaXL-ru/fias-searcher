@@ -60,11 +60,17 @@
         </div>
       </div>
       
-      <div class="buttons">
+      <div class="fias__searchform__btn">
         <button type="submit" class="fias__searchform__btn__search"
           id="search_fias_search_id"
           disabled="disabled">
           Поиск
+        </button>
+        
+        <button type="submit" class="fias__searchform__btn__export_mariadb"
+          id="search_fias_export_mariadb_id"
+          disabled="disabled">
+          Экспорт в MariaDB
         </button>
       </div>
     </form>

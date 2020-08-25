@@ -44,9 +44,10 @@ h1 {
   margin-right: 2rem;
 }
 
-.fias__searchform__btn__search {
+.fias__searchform__btn button {
   font-size: 1.2rem;
   padding: 0.3rem;
+  margin-right: 2rem;
 }
 
 .fias__search__result[data-is-found=""] .fias__search__result__table,

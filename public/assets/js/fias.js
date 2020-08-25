@@ -107,6 +107,7 @@
     const houseEl  = getElementById('search_fias_house_id');
     
     const searchBtn = getElementById('search_fias_search_id');
+    const exporttoMariaDb = getElementById('search_fias_export_mariadb_id');
 
     const searchResultContainer = getElementById('fias__search__result_id');
     const searchResults = getElementById('search_fias_result_tbl_id');
@@ -120,6 +121,13 @@
     };
     
     // data providers
+    const searchFormToUrl = function () {
+      return '&regionGuid=' + _this.searchValues.regionId +
+        '&cityGuid='   + _this.searchValues.cityId   +
+        '&streetGuid=' + _this.searchValues.streetId +
+        '&houseGuid='  + (_this.searchValues.houseId || '');
+    };
+    
     const loadCities = function (callback) {
       getJson(
         '/index.php?action=cities&regionGuid=' + _this.searchValues.regionId,
@@ -155,11 +163,7 @@
     
     const search = function (callback) {
       getJson(
-        '/index.php?action=search'             +
-          '&regionGuid=' + _this.searchValues.regionId +
-          '&cityGuid='   + _this.searchValues.cityId   +
-          '&streetGuid=' + _this.searchValues.streetId +
-          '&houseGuid='  + (_this.searchValues.houseId || ''),
+        '/index.php?action=search' + searchFormToUrl(),
         function (addresses) {
           const tBodyResult = searchResults.getElementsByTagName('tbody')[0];
           
@@ -176,12 +180,35 @@
       );
     };
     
+    const exportToMariaDb = function (callback) {
+      getJson(
+        '/index.php?action=exportToMariaDb' + searchFormToUrl(),
+        function (result) {
+          if (result.isOk) {
+            alert('Экспорт успешно выполнен');
+          }
+          
+          callback();
+        }
+      );
+    };
+    
     // helpers
     // clear and disable select
     const resetSelects = function (elements) {
       elements.forEach(
         (selectEl) => { disableElement(selectEl); clearSelect(selectEl); }
       );
+    };
+    
+    const enableButtons = function () {
+      enableElement(searchBtn);
+      enableElement(exporttoMariaDb);
+    };
+    
+    const disableButtons = function () {
+      disableElement(searchBtn);
+      disableElement(exporttoMariaDb);
     };
     
     // events
@@ -195,9 +222,7 @@
         
         // clear and disabled depends selects
         resetSelects([cityEl, streetEl, houseEl]);
-
-        // disable searching
-        disableElement(searchBtn);
+        disableButtons();
         
         if (_this.searchValues.regionId) {
           loadCities(
@@ -218,9 +243,7 @@
 
         // clear and disable depends selects
         resetSelects([streetEl, houseEl]);
-
-        // disable searching
-        disableElement(searchBtn);
+        disableButtons();
         
         if (_this.searchValues.cityId) {
           loadStreets(
@@ -244,12 +267,11 @@
           loadHouses(
             function () {
               enableElement(houseEl);
-              
-              enableElement(searchBtn);
+              enableButtons();
             }
           );
         } else {
-          disableElement(searchBtn);
+          disableButtons();
         }
       }
     );
@@ -264,11 +286,20 @@
     searchBtn.addEventListener(
       EVENT_DOM_ELEMENT_CLICK,
       function () {
-        disableElement(searchBtn);
+        disableButtons();
         
-        search(() => { enableElement(searchBtn) });
+        search(() => { enableButtons() });
       }
-    )
+    );
+
+    exporttoMariaDb.addEventListener(
+      EVENT_DOM_ELEMENT_CLICK,
+      function () {
+        disableButtons();
+
+        exportToMariaDb(() => { enableButtons() });
+      }
+    );
   };
   
   let sf = new searchForm();
