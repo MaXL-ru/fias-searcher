@@ -85,6 +85,75 @@ class Postgres
     );
   }
   
+  public function search(
+    string $regionId,
+    string $cityGuid,
+    string $streetGuid,
+    string $houseGuid
+  ): array {
+    $where = [
+      'region."AOGUID" = :regionGuid',
+      'city."AOGUID"   = :cityGuid',
+      'street."AOGUID" = :streetGuid',
+      'region."NEXTID" IS NULL',
+      'city."NEXTID" IS NULL',
+      'street."NEXTID" IS NULL',
+      'house."ENDDATE" > NOW()'
+    ];
+    $params = [
+      ':regionGuid' => $regionId,
+      ':cityGuid'   => $cityGuid,
+      ':streetGuid' => $streetGuid,
+    ];
+    
+    if ($houseGuid) {
+      $where[] = 'house."HOUSEGUID" = :houseGuid';
+      $params[':houseGuid'] = $houseGuid;
+    }
+    
+    $addresses = $this->_fetchFromQuery(
+      '
+        SELECT
+          region."OFFNAME" AS regionname,
+          city."OFFNAME" AS cityname,
+          street."SHORTNAME" || \'. \' || street."FORMALNAME" AS streetname,
+          house."HOUSENUM",
+          house."BUILDNUM",
+          house."STRUCNUM",
+          house."POSTALCODE" AS postalcode
+          
+        FROM "ADDROB" AS region
+        
+        INNER JOIN "ADDROB" AS city ON
+          city."PARENTGUID" = region."AOGUID"
+          
+        INNER JOIN "ADDROB" AS street ON
+          street."PARENTGUID" = city."AOGUID"
+          
+        INNER JOIN "HOUSE" AS house ON
+          house."AOGUID" = street."AOGUID"
+        
+        WHERE ' . implode(' AND ', $where) .
+        '
+        ORDER BY
+          NULLIF(regexp_replace(house."HOUSENUM", \'\D\', \'\', \'g\'), \'\')::int,
+          regexp_replace(house."HOUSENUM", \'\d\', \'\', \'g\')
+        ',
+      $params
+    );
+    
+    return array_map(
+      fn (array $address): array  => [
+        'regionName' => $address['regionname'],
+        'cityName' => $address['cityname'],
+        'streetName' => $address['streetname'],
+        'house' => $this->_createFullHouseNum($address),
+        'postalcode' => $address['postalcode']
+      ],
+      $addresses
+    );
+  }
+  
   private function _findMainAddrRecords(
     int $levelId,
     ?string $parentGuid

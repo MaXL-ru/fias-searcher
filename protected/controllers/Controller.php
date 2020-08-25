@@ -65,13 +65,39 @@ class Controller
   public function actionHouses(): void
   {
     $streetGuid = (string)$this->_fromGet('streetGuid');
-
+    
     if (!$streetGuid) {
+      throw new \Exception(self::E_INVALID_PARAMS);
+    }
+    
+    $this->_viewer->renderJson(
+      $this->_postgresProvider->findHouses($streetGuid)
+    );
+  }
+
+  public function actionSearch(): void
+  {
+    $regionId = (string)$this->_fromGet('regionGuid');
+    $cityGuid = (string)$this->_fromGet('cityGuid');
+    $streetGuid = (string)$this->_fromGet('streetGuid');
+    $houseGuid = (string)$this->_fromGet('houseGuid');
+    
+    if (!$regionId || !$cityGuid || !$streetGuid) {
       throw new \Exception(self::E_INVALID_PARAMS);
     }
 
     $this->_viewer->renderJson(
-      $this->_postgresProvider->findHouses($streetGuid)
+      array_map(
+        fn (array $address) => array_values($address),
+        array_values(
+          $this->_postgresProvider->search(
+            $regionId,
+            $cityGuid,
+            $streetGuid,
+            $houseGuid
+          )
+        )
+      )
     );
   }
   

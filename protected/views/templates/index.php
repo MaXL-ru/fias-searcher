@@ -61,13 +61,37 @@
       </div>
       
       <div class="buttons">
-        <button type="submit" class="fias__searchform__btn__search">
+        <button type="submit" class="fias__searchform__btn__search"
+          id="search_fias_search_id"
+          disabled="disabled">
           Поиск
         </button>
       </div>
     </form>
     
-    <footer>
+    <div id="fias__search__result_id" class="fias__search__result" data-is-found="">
+      <table id="search_fias_result_tbl_id" class="fias__search__result__table">
+        <caption>Результаты поиска</caption>
+        <thead>
+          <tr>
+            <th>Регион</th>
+            <th>Улица</th>
+            <th>Город</th>
+            <th>Дом</th>
+            <th>Индекс</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+        </tbody>
+      </table>
+      
+      <div class="fias__search__result__nothing">
+        <strong>Ничего не найдено.</strong>
+      </div>
+    </div>
+    
+    <footer class="fias__footer">
       © MaXL 2020
     </footer>
     <script src="assets/js/fias.js"></script>

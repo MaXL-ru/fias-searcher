@@ -46,3 +46,56 @@ h1 {
   font-size: 1.2rem;
   padding: 0.3rem;
 }
+
+.fias__search__result[data-is-found=""] .fias__search__result__table,
+.fias__search__result[data-is-found="0"] .fias__search__result__table,
+.fias__search__result[data-is-found=""] .fias__search__result__nothing,
+.fias__search__result[data-is-found="1"] .fias__search__result__nothing {
+  display: none;
+}
+
+.fias__search__result[data-is-found="1"] .fias__search__result__table {
+  display: table;
+}
+
+.fias__search__result[data-is-found="0"] .fias__search__result__nothing {
+  display: block;
+}
+
+.fias__search__result__table {
+  min-width: 50%;
+  border-collapse: collapse;
+}
+
+.fias__search__result__table caption {
+  margin: 1rem 0;
+  font-size: 1.2rem;
+}
+
+.fias__search__result__table td, .fias__search__result__table th {
+  padding: 0.25rem;
+  border: 0.15rem solid #888;
+}
+
+.fias__search__result__table th {
+  text-align: center;
+  background-color: #ddd;
+}
+
+.fias__search__result__table tr:nth-child(odd) td {
+  background:  #eee;
+}
+
+.fias__search__result__nothing {
+  width: 20rem;
+  font-size: 1.2rem;
+  padding: 1.5rem;
+  background: #eee;
+  border: 0.15rem solid #ddd;
+}
+
+.fias__footer {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 0.15rem solid #ccc;
+}

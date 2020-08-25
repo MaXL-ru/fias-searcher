@@ -9,6 +9,7 @@
 
 (function (document) {
   const EVENT_DOM_ELEMENT_CHANGE = 'change';
+  const EVENT_DOM_ELEMENT_CLICK  = 'click';
 
   // helpers
   const getElementById = function (id) {
@@ -25,11 +26,11 @@
     }
   };
   
-  const enableSelect = function (element) {
+  const enableElement = function (element) {
     element.removeAttribute('disabled');
   };
 
-  const disableSelect = function (element) {
+  const disableElement = function (element) {
     element.setAttribute('disabled', true);
   };
   
@@ -46,6 +47,26 @@
         option.text = i.text;
         
         element.add(option);
+      }
+    );
+  };
+  
+  const assignItemsToTable = function (element, items) {
+    items.forEach(
+      (row) => {
+        const tr = document.createElement('tr');
+
+        row.forEach(
+          (cell) => {
+            const td = document.createElement('td');
+            
+            td.innerHTML = cell;
+            
+            tr.appendChild(td);
+          }
+        );
+        
+        element.appendChild(tr);
       }
     );
   };
@@ -72,6 +93,11 @@
     const cityEl   = getElementById('search_fias_city_id');
     const streetEl = getElementById('search_fias_street_id');
     const houseEl  = getElementById('search_fias_house_id');
+    
+    const searchBtn = getElementById('search_fias_search_id');
+
+    const searchResultContainer = getElementById('fias__search__result_id');
+    const searchResults = getElementById('search_fias_result_tbl_id');
     
     // selected values
     _this.searchValues = {
@@ -115,6 +141,29 @@
       );
     };
     
+    const search = function (callback) {
+      getJson(
+        '/index.php?action=search'             +
+          '&regionGuid=' + _this.searchValues.regionId +
+          '&cityGuid='   + _this.searchValues.cityId   +
+          '&streetGuid=' + _this.searchValues.streetId +
+          '&houseGuid='  + (_this.searchValues.houseId || ''),
+        function (addresses) {
+          const tBodyResult = searchResults.getElementsByTagName('tbody')[0];
+          
+          tBodyResult.innerHTML = '';
+          assignItemsToTable(tBodyResult, addresses);
+
+          searchResultContainer.setAttribute(
+            'data-is-found',
+            addresses.length > 0 ? '1' : '0'
+          );
+          
+          callback();
+        }
+      );
+    };
+    
     // events
     regionEl.addEventListener(
       EVENT_DOM_ELEMENT_CHANGE,
@@ -125,17 +174,20 @@
         _this.searchValues.houseId = null;
         
         // clear and disabled depends selects
-        disableSelect(cityEl);
-        disableSelect(streetEl);
-        disableSelect(houseEl);
+        disableElement(cityEl);
+        disableElement(streetEl);
+        disableElement(houseEl);
         clearSelect(cityEl);
         clearSelect(streetEl);
         clearSelect(houseEl);
+
+        // disable searching
+        disableElement(searchBtn);
         
         if (_this.searchValues.regionId) {
           loadCities(
             function () {
-              enableSelect(cityEl);
+              enableElement(cityEl);
             }
           );
         }
@@ -150,15 +202,18 @@
         _this.searchValues.houseId = null;
 
         // clear and disable depends selects
-        disableSelect(streetEl);
-        disableSelect(houseEl);
+        disableElement(streetEl);
+        disableElement(houseEl);
         clearSelect(streetEl);
         clearSelect(houseEl);
+
+        // disable searching
+        disableElement(searchBtn);
         
         if (_this.searchValues.cityId) {
           loadStreets(
             function () {
-              enableSelect(streetEl);
+              enableElement(streetEl);
             }
           );
         }
@@ -171,13 +226,15 @@
         _this.searchValues.streetId = getSelectedValue(streetEl);
         
         // clear and disable depends selects
-        disableSelect(houseEl);
+        disableElement(houseEl);
         clearSelect(houseEl);
         
         if (_this.searchValues.streetId) {
           loadHouses(
             function () {
-              enableSelect(houseEl);
+              enableElement(houseEl);
+              
+              enableElement(searchBtn);
             }
           );
         }
@@ -190,6 +247,15 @@
         _this.searchValues.houseId = getSelectedValue(houseEl);
       }
     );
+
+    searchBtn.addEventListener(
+      EVENT_DOM_ELEMENT_CLICK,
+      function () {
+        disableElement(searchBtn);
+        
+        search(() => { enableElement(searchBtn) });
+      }
+    )
   };
   
   let sf = new searchForm();
