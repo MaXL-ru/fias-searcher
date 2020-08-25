@@ -24,12 +24,14 @@ h1 {
 
 .fias__searchform select {
   width: 20rem;
+  font-size: 1.1rem;
+  padding: 0.25rem;
 }
 
 .fias__searchform label {
   display: block;
   padding-bottom: 0.5rem;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
 }
 
 .fias__searchform__row {
