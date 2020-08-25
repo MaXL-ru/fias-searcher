@@ -13,7 +13,8 @@
     <h1>Поиск данных в ФИАС</h1>
     
     <form action="/index.php?action=search" method="post"
-      class="fias__searchform"
+      class="fias__searchform" id="fias__searchform__id"
+      onsubmit="return false;"
     >
       <h3>Уточните критерии поиска</h3>
       
@@ -67,7 +68,7 @@
           Поиск
         </button>
         
-        <button type="submit" class="fias__searchform__btn__export_mariadb"
+        <button type="button" class="fias__searchform__btn__export_mariadb"
           id="search_fias_export_mariadb_id"
           disabled="disabled">
           Экспорт в MariaDB

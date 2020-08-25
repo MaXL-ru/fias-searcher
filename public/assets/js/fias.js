@@ -10,6 +10,7 @@
 (function (document) {
   const EVENT_DOM_ELEMENT_CHANGE = 'change';
   const EVENT_DOM_ELEMENT_CLICK  = 'click';
+  const EVENT_DOM_ELEMENT_SUBMIT = 'submit';
   
   const ERR_WHILE_LOAD_DATA = 'Произошла ошибка во время загрузки данных: ';
 
@@ -283,8 +284,8 @@
       }
     );
 
-    searchBtn.addEventListener(
-      EVENT_DOM_ELEMENT_CLICK,
+    getElementById('fias__searchform__id').addEventListener(
+      EVENT_DOM_ELEMENT_SUBMIT,
       function () {
         disableButtons();
         
