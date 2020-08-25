@@ -176,6 +176,14 @@
       );
     };
     
+    // helpers
+    // clear and disable select
+    const resetSelects = function (elements) {
+      elements.forEach(
+        (selectEl) => { disableElement(selectEl); clearSelect(selectEl); }
+      );
+    };
+    
     // events
     regionEl.addEventListener(
       EVENT_DOM_ELEMENT_CHANGE,
@@ -186,12 +194,7 @@
         _this.searchValues.houseId = null;
         
         // clear and disabled depends selects
-        disableElement(cityEl);
-        disableElement(streetEl);
-        disableElement(houseEl);
-        clearSelect(cityEl);
-        clearSelect(streetEl);
-        clearSelect(houseEl);
+        resetSelects([cityEl, streetEl, houseEl]);
 
         // disable searching
         disableElement(searchBtn);
@@ -214,10 +217,7 @@
         _this.searchValues.houseId = null;
 
         // clear and disable depends selects
-        disableElement(streetEl);
-        disableElement(houseEl);
-        clearSelect(streetEl);
-        clearSelect(houseEl);
+        resetSelects([streetEl, houseEl]);
 
         // disable searching
         disableElement(searchBtn);
@@ -238,8 +238,7 @@
         _this.searchValues.streetId = getSelectedValue(streetEl);
         
         // clear and disable depends selects
-        disableElement(houseEl);
-        clearSelect(houseEl);
+        resetSelects([houseEl]);
         
         if (_this.searchValues.streetId) {
           loadHouses(
