@@ -40,7 +40,20 @@ class Postgres
 
   public function findStreets(string $cityGuid): array
   {
-    return $this->_findMainAddrRecords(self::FIAS_LEVEL_ID_STREET, $cityGuid);
+    return $this->_fetchFromQuery(
+      '
+        SELECT
+          "SHORTNAME" || \'. \' || "FORMALNAME" AS text, "AOGUID" AS value
+        FROM "ADDROB"
+        WHERE "NEXTID" IS NULL AND "AOLEVEL" = :levelId AND
+          "PARENTGUID" = :parentGuid
+        ORDER BY "OFFNAME"
+      ',
+      [
+        ':levelId' => self::FIAS_LEVEL_ID_STREET,
+        ':parentGuid' => $cityGuid
+      ]
+    );
   }
 
   public function findHouses(string $streetGuid): array
