@@ -11,22 +11,11 @@ declare(strict_types=1);
 
 namespace maxl\fias\providers;
 
-class Postgres
+class Postgres extends Base
 {
   private const FIAS_LEVEL_ID_REGION = 1;
   private const FIAS_LEVEL_ID_CITY   = 4;
   private const FIAS_LEVEL_ID_STREET = 7;
-  
-  private \PDO $_pdo;
-  
-  public function __construct(string $dsn, string $username, $password)
-  {
-    $this->_pdo = new \PDO(
-      $dsn,
-      $username,
-      $password
-    );
-  }
   
   public function findRegions(): array
   {
@@ -185,7 +174,7 @@ class Postgres
   
   private function _fetchFromQuery(string $sql, array $params = []): array
   {
-    $statement = $this->_pdo->prepare($sql);
+    $statement = $this->pdo->prepare($sql);
 
     foreach ($params as $name => $value) {
       $statement->bindValue($name, $value);
