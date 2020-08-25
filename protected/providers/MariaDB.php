@@ -19,12 +19,16 @@ class MariaDB extends Base
     $valueSql = [];
     
     foreach ($addresses as $i => $address) {
-      $valueSql[] = "(:a$i)";
-      $params[":a$i"] = implode(' ', $address);
+      $valueSql[] = "(:r$i, :c$i, :s$i, :h$i)";
+      
+      $params[":r$i"] = $address['regionName'];
+      $params[":c$i"] = $address['cityName'];
+      $params[":s$i"] = $address['streetName'];
+      $params[":h$i"] = $address['house'];
     }
     
     $statement = $this->pdo->prepare(
-      "INSERT INTO `fiasdb`.`addresses_full` VALUES " . implode(',', $valueSql)
+      "INSERT INTO `fiasdb`.`addresses` VALUES " . implode(',', $valueSql)
     );
     
     array_walk(
