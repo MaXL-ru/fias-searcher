@@ -42,6 +42,35 @@ class Postgres
   {
     return $this->_findMainAddrRecords(self::FIAS_LEVEL_ID_STREET, $cityGuid);
   }
+
+  public function findHouses(string $streetGuid): array
+  {
+    $houses = $this->_fetchFromQuery(
+      '
+        SELECT
+          "HOUSENUM",
+          "BUILDNUM",
+          "STRUCNUM",
+          "HOUSEGUID" AS value
+        FROM "HOUSE"
+        WHERE "AOGUID" = :streetGuid AND "ENDDATE" > NOW()
+        ORDER BY
+          NULLIF(regexp_replace("HOUSENUM", \'\D\', \'\', \'g\'), \'\')::int,
+          regexp_replace("HOUSENUM", \'\d\', \'\', \'g\')
+      ',
+      [
+        ':streetGuid' => $streetGuid
+      ]
+    );
+    
+    return array_map(
+      fn (array $h): array => [
+        'text'  => $this->_createFullHouseNum($h),
+        'value' => $h['value']
+      ],
+      $houses
+    );
+  }
   
   private function _findMainAddrRecords(
     int $levelId,
@@ -83,5 +112,19 @@ class Postgres
     $statement->execute();
 
     return $statement->fetchAll(\PDO::FETCH_ASSOC);
+  }
+  
+  private function _createFullHouseNum(array $h): string
+  {
+    return implode(
+      ', ',
+      array_filter(
+        [
+          $h['HOUSENUM'] ? 'д. ' . $h['HOUSENUM'] : null,
+          $h['BUILDNUM'] ? 'корп. ' . $h['BUILDNUM'] : null,
+          $h['STRUCNUM'] ? 'стр. ' . $h['STRUCNUM'] : null
+        ]
+      )
+    );
   }
 }

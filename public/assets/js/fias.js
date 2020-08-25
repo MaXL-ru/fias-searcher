@@ -71,6 +71,7 @@
     const regionEl = getElementById('search_fias_region_id');
     const cityEl   = getElementById('search_fias_city_id');
     const streetEl = getElementById('search_fias_street_id');
+    const houseEl  = getElementById('search_fias_house_id');
     
     // selected values
     _this.searchValues = {
@@ -103,6 +104,17 @@
       );
     };
     
+    const loadHouses = function (callback) {
+      getJson(
+        '/index.php?action=houses&streetGuid=' + _this.searchValues.streetId,
+        function (houses) {
+          assignItemsToSelect(houseEl, houses);
+          
+          callback();
+        }
+      );
+    };
+    
     // events
     regionEl.addEventListener(
       EVENT_DOM_ELEMENT_CHANGE,
@@ -115,8 +127,10 @@
         // clear and disabled depends selects
         disableSelect(cityEl);
         disableSelect(streetEl);
+        disableSelect(houseEl);
         clearSelect(cityEl);
         clearSelect(streetEl);
+        clearSelect(houseEl);
         
         if (_this.searchValues.regionId) {
           loadCities(
@@ -137,7 +151,9 @@
 
         // clear and disable depends selects
         disableSelect(streetEl);
+        disableSelect(houseEl);
         clearSelect(streetEl);
+        clearSelect(houseEl);
         
         if (_this.searchValues.cityId) {
           loadStreets(
@@ -148,8 +164,34 @@
         }
       }
     );
-  };
 
+    streetEl.addEventListener(
+      EVENT_DOM_ELEMENT_CHANGE,
+      function () {
+        _this.searchValues.streetId = getSelectedValue(streetEl);
+        
+        // clear and disable depends selects
+        disableSelect(houseEl);
+        clearSelect(houseEl);
+        
+        if (_this.searchValues.streetId) {
+          loadHouses(
+            function () {
+              enableSelect(houseEl);
+            }
+          );
+        }
+      }
+    );
+
+    houseEl.addEventListener(
+      EVENT_DOM_ELEMENT_CHANGE,
+      function () {
+        _this.searchValues.houseId = getSelectedValue(houseEl);
+      }
+    );
+  };
+  
   let sf = new searchForm();
   
 })(document);

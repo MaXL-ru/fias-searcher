@@ -61,6 +61,19 @@ class Controller
       $this->_postgresProvider->findStreets($cityGuid)
     );
   }
+
+  public function actionHOuses(): void
+  {
+    $streetGuid = (string)$this->_fromGet('streetGuid');
+
+    if (!$streetGuid) {
+      throw new \Exception(self::E_INVALID_PARAMS);
+    }
+
+    $this->_viewer->renderJson(
+      $this->_postgresProvider->findHouses($streetGuid)
+    );
+  }
   
   private function _initDataProviders(): void
   {
