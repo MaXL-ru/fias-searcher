@@ -26,14 +26,16 @@ require_once __DIR__ . '/../protected/sys/Autoloader.php';
 $viewer = new maxl\fias\views\WebViewer();
 
 // run controller action
+try {
+  $action = $_GET['action'] ?? 'index';
+  $controller = new maxl\fias\controllers\Controller($viewer);
+  $actionMethodName = 'action' . ucfirst($action);
 
-$action = $_GET['action'] ?? 'index';
+  if (!method_exists($controller, $actionMethodName)) {
+    throw new \Exception('Invalid call');
+  }
 
-$controller = new maxl\fias\controllers\Controller($viewer);
-$actionMethodName = 'action' . ucfirst($action);
-
-if (!method_exists($controller, $actionMethodName)) {
-  throw new \Exception('Invalid call');
+  $controller->$actionMethodName();
+} catch (\Exception $e) {
+  $viewer->renderJson(['error' => $e->getMessage()]);
 }
-
-$controller->$actionMethodName();

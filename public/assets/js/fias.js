@@ -10,6 +10,8 @@
 (function (document) {
   const EVENT_DOM_ELEMENT_CHANGE = 'change';
   const EVENT_DOM_ELEMENT_CLICK  = 'click';
+  
+  const ERR_WHILE_LOAD_DATA = 'Произошла ошибка во время загрузки данных: ';
 
   // helpers
   const getElementById = function (id) {
@@ -76,7 +78,17 @@
 
     httpRequest.onreadystatechange = function () {
       if (httpRequest.readyState === XMLHttpRequest.DONE) {
-        callback(JSON.parse(httpRequest.responseText));
+        let result = null;
+        
+        try {
+          result = JSON.parse(httpRequest.responseText);
+        } finally {
+          if (result === null || result.error !== undefined) {
+            alert(ERR_WHILE_LOAD_DATA + (result.error || ''));
+          }
+          
+          callback(result || []);
+        }
       }
     };
     
