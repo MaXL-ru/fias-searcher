@@ -231,7 +231,7 @@
         }
       }
     );
-
+    
     streetEl.addEventListener(
       EVENT_DOM_ELEMENT_CHANGE,
       function () {
@@ -248,6 +248,8 @@
               enableElement(searchBtn);
             }
           );
+        } else {
+          disableElement(searchBtn);
         }
       }
     );
